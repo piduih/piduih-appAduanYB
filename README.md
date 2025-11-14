@@ -1,3 +1,5 @@
+<img width="780" height="505" alt="image" src="https://github.com/user-attachments/assets/9771b506-daa6-4e0d-9c96-381b93ca5673" />
+
 # Sistem Aduan Komuniti YB
 
 Aplikasi web ini direka untuk menjadi platform perantaraan antara komuniti dan wakil rakyat (YB). Ia membolehkan penduduk setempat menghantar aduan mengenai isu-isu komuniti dengan mudah, dan pada masa yang sama, menyediakan alat untuk YB menjejaki, mengurus, dan memberi maklum balas terhadap aduan tersebut secara telus.
