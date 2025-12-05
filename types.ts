@@ -16,3 +16,10 @@ export interface Complaint {
   comments: string;
   timestamp: Date;
 }
+
+declare global {
+  interface AIStudio {
+    hasSelectedApiKey: () => Promise<boolean>;
+    openSelectKey: () => Promise<void>;
+  }
+}

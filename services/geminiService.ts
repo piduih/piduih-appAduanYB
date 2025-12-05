@@ -1,13 +1,15 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 
-// FIX: Aligned with Gemini API guidelines by removing manual API key checks and
-// using process.env.API_KEY directly for initialization. The API key is
-// assumed to be present, and any errors (like a missing key) will be handled
-// by the try/catch block below.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// We strictly avoid global initialization of 'ai' to ensure we pick up the 
+// latest API key selected by the user via window.aistudio.
+// The API key is injected into process.env.API_KEY after selection.
 
 export const suggestCategory = async (description: string): Promise<string> => {
   try {
+    // Initialize the client immediately before use to grab the dynamic key
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+    
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Berdasarkan keterangan aduan berikut, kelaskan ke dalam salah satu kategori ini: "Infrastruktur", "Kebersihan", "Keselamatan", "Sosial", atau "Lain-lain".\n\nKeterangan: "${description}"`,
@@ -32,6 +34,12 @@ export const suggestCategory = async (description: string): Promise<string> => {
 
   } catch (error) {
     console.error("Error suggesting category with Gemini:", error);
+    
+    // Check if the error is related to API Key validity
+    if (error.toString().includes("API key not valid") || error.toString().includes("403")) {
+        console.warn("API Key might be invalid or expired.");
+    }
+    
     return "Lain-lain"; // Fallback category
   }
 };
