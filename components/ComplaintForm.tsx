@@ -1,16 +1,18 @@
 
 import React, { useState } from 'react';
 import { Complaint, ComplaintStatus } from '../types';
-import { suggestCategory } from '../services/geminiService';
 import Spinner from './Spinner';
 
 interface ComplaintFormProps {
   onAddComplaint: (complaint: Complaint) => void;
 }
 
+const CATEGORIES = ["Infrastruktur", "Kebersihan", "Keselamatan", "Sosial", "Lain-lain"];
+
 const ComplaintForm: React.FC<ComplaintFormProps> = ({ onAddComplaint }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState(CATEGORIES[0]);
   const [image, setImage] = useState<string | undefined>(undefined);
   const [imageName, setImageName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,33 +40,35 @@ const ComplaintForm: React.FC<ComplaintFormProps> = ({ onAddComplaint }) => {
     setError('');
     setIsLoading(true);
     
-    try {
-      const category = await suggestCategory(description);
+    // Simulate network delay since we removed AI
+    setTimeout(() => {
+      try {
+        const newComplaint: Complaint = {
+          id: Date.now().toString(),
+          title,
+          description,
+          category,
+          image,
+          status: ComplaintStatus.Baru,
+          comments: '',
+          timestamp: new Date(),
+        };
 
-      const newComplaint: Complaint = {
-        id: Date.now().toString(),
-        title,
-        description,
-        category,
-        image,
-        status: ComplaintStatus.Baru,
-        comments: '',
-        timestamp: new Date(),
-      };
+        onAddComplaint(newComplaint);
 
-      onAddComplaint(newComplaint);
-
-      // Reset form
-      setTitle('');
-      setDescription('');
-      setImage(undefined);
-      setImageName('');
-    } catch (err) {
-      setError('Gagal menghantar aduan. Sila cuba lagi.');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+        // Reset form
+        setTitle('');
+        setDescription('');
+        setCategory(CATEGORIES[0]);
+        setImage(undefined);
+        setImageName('');
+      } catch (err) {
+        setError('Gagal menghantar aduan. Sila cuba lagi.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 800);
   };
 
   return (
@@ -83,6 +87,21 @@ const ComplaintForm: React.FC<ComplaintFormProps> = ({ onAddComplaint }) => {
             placeholder="Cth: Lampu jalan rosak"
           />
         </div>
+        
+        <div>
+          <label htmlFor="category" className="block text-sm font-medium text-slate-700">Kategori</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-slate-700">Keterangan</label>
           <textarea
